@@ -24,75 +24,33 @@ function carbontest_boot() {
 add_action( 'plugin_loaded', 'carbontest_boot' );
 
 function carbontest_metabox_demo() {
-	Container::make( 'post_meta', 'Sample Metabox' )
-	         ->where( 'post_type', '=', 'page' )
-	         ->add_fields( [
-		         /*Field::make( 'text', 'carbontest_address' )->set_default_value( 'Sample Address' ),
-		         Field::make( 'text', 'carbontest_opening' )->set_default_value( 'Sat-Thu 10M-9PM' ),
-		         Field::make( 'checkbox', 'carbontest_isopen', 'Is Open' )->set_option_value( 'yes' ),
-		         Field::make( 'image', 'carbontest_image', __( 'Image' ) ),
-		         Field::make( 'media_gallery', 'carbontest_media_gallery', __( 'media_gallery' ) ),
-		         Field::make( 'html', 'crb_information_text' )
-		              ->set_html( '<h2>Lorem ipsum</h2><p>Quisque mattis ligula.</p>' ),
-		         Field::make( 'multiselect', 'crb_available_colors', __( 'Available Colors' ) )
-		              ->add_options( array(
-			              'red' => 'Red',
-			              'green' => 'Green',
-			              'blue' => 'Blue',
-		              ) ),*/
-		         Field::make( 'complex', 'crb_media_item' )
-		              ->add_fields( 'photograph', array(
-			              Field::make( 'image', 'image' ),
-			              Field::make( 'text', 'caption' ),
-		              ) )
-		              ->add_fields( 'movie', array(
-			              Field::make( 'file', 'video' ),
-			              Field::make( 'text', 'title' ),
-			              Field::make( 'text', 'length' ),
-		              ) ),
+
+	wp_enqueue_style( 'carbontest-style', plugin_dir_url( __FILE__ ) . '/assets/css/carbontest-style.css' );
+	wp_enqueue_script( 'carbontest-js', plugin_dir_url( __FILE__ ) . '/assets/js/main.js', array( 'jquery' ), time(), true );
 
 
-	         ] );
-
-	Container::make( 'post_meta', 'Slider Data' )
-	         ->where( 'post_type', '=', 'page' )
-	         ->add_fields( array(
-		         Field::make( 'complex', 'crb_slides' )
-		              ->add_fields( array(
-			              Field::make( 'image', 'image' ),
-			              Field::make( 'complex', 'slide_fragments' )
-			                   ->add_fields( array(
-				                   Field::make( 'text', 'fragment_text' ),
-				                   Field::make( 'select', 'fragment_position' )
-				                        ->add_options( array( 'Top Left', 'Top Right', 'Bottom Left', 'Bottom Right' ) ),
-			                   ))
-		              )),
-	         ));
-
-
-	Block::make( __( 'My Shiny Gutenberg Block' ) )
+	Block::make( __( 'According' ) )
 	     ->add_fields( array(
-		     Field::make( 'text', 'heading', __( 'Block Heading' ) ),
-		     Field::make( 'image', 'image', __( 'Block Image' ) ),
-		     Field::make( 'rich_text', 'content', __( 'Block Content' ) ),
+		     Field::make( 'complex', 'crb_according', __( 'Slider' ) )
+                 ->set_layout('tabbed-horizontal')
+		          ->add_fields( array(
+			          Field::make( 'text', 'heading', __( 'Block Heading' ) ),
+			          Field::make( 'textarea', 'content', __( 'Block Content' ) ),
+		          ) )
 	     ) )
+	     ->set_style( 'carbontest-style' )
 	     ->set_render_callback( function ( $fields, $attributes, $inner_blocks ) {
 		     ?>
-
-		     <div class="block">
-			     <div class="block__heading">
-				     <h1><?php echo esc_html( $fields['heading'] ); ?></h1>
-			     </div><!-- /.block__heading -->
-
-			     <div class="block__image">
-				     <?php echo wp_get_attachment_image( $fields['image'], 'full' ); ?>
-			     </div><!-- /.block__image -->
-
-			     <div class="block__content">
-				     <?php echo apply_filters( 'the_content', $fields['content'] ); ?>
-			     </div><!-- /.block__content -->
-		     </div><!-- /.block -->
-
+             <div class="block accordion-container">
+			     <?php foreach ( $fields['crb_according'] as $field ) {
+				     ?>
+                     <h1 class="title"><?php echo $field['heading'] ?></h1>
+                     <div class="body">
+                         <p><?php echo $field['content'] ?></p>
+                     </div>
+				     <?php
+			     } ?>
+             </div>
 		     <?php
 	     } );
 }
