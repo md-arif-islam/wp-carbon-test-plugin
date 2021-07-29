@@ -13,6 +13,7 @@ Domain Path: /languages/
 
 use Carbon_Fields\Container;
 use Carbon_Fields\Field;
+use Carbon_Fields\Block;
 
 require_once "vendor/autoload.php";
 
@@ -23,7 +24,7 @@ function carbontest_boot() {
 add_action( 'plugin_loaded', 'carbontest_boot' );
 
 function carbontest_metabox_demo() {
-	Container::make( 'theme_options', 'Sample Metabox' )
+	Container::make( 'post_meta', 'Sample Metabox' )
 	         ->where( 'post_type', '=', 'page' )
 	         ->add_fields( [
 		         /*Field::make( 'text', 'carbontest_address' )->set_default_value( 'Sample Address' ),
@@ -67,6 +68,33 @@ function carbontest_metabox_demo() {
 			                   ))
 		              )),
 	         ));
+
+
+	Block::make( __( 'My Shiny Gutenberg Block' ) )
+	     ->add_fields( array(
+		     Field::make( 'text', 'heading', __( 'Block Heading' ) ),
+		     Field::make( 'image', 'image', __( 'Block Image' ) ),
+		     Field::make( 'rich_text', 'content', __( 'Block Content' ) ),
+	     ) )
+	     ->set_render_callback( function ( $fields, $attributes, $inner_blocks ) {
+		     ?>
+
+		     <div class="block">
+			     <div class="block__heading">
+				     <h1><?php echo esc_html( $fields['heading'] ); ?></h1>
+			     </div><!-- /.block__heading -->
+
+			     <div class="block__image">
+				     <?php echo wp_get_attachment_image( $fields['image'], 'full' ); ?>
+			     </div><!-- /.block__image -->
+
+			     <div class="block__content">
+				     <?php echo apply_filters( 'the_content', $fields['content'] ); ?>
+			     </div><!-- /.block__content -->
+		     </div><!-- /.block -->
+
+		     <?php
+	     } );
 }
 
 add_action( 'carbon_fields_register_fields', 'carbontest_metabox_demo' );
